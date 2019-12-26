@@ -12,7 +12,7 @@ function Population(){
         this.global_add_node_mutation_list = [];
         this.population = [];
         this.all_species_list = [];
-        this.mating_pool = [];
+        this.species_total_fitness = 0;
         this.crossover_population = [];
         this.population = [];
         this.generation = 1;
@@ -75,9 +75,12 @@ function Population(){
     };
     this.getNewPopulation = function(){
         this.generateSpecies();
-        this.sortSpecies();
+        this.sortSpeciesPlayers();
         this.prunePopulation();
         this.calculateSpecificFitness();
+        this.calculateSpeciesFitness();
+        this.generateOffspring();
+
         console.log(this.all_species_list);
     };
     // Main functions
@@ -126,6 +129,7 @@ function Population(){
             }
         }
     };
+    // Generate the species based off distance
     this.generateSpecies = function(){
         let all_species_list = [];
         for(let player of this.population){
@@ -155,13 +159,15 @@ function Population(){
         }
         this.all_species_list = all_species_list;
     };
-    this.sortSpecies = function(){
+    // Sorts the players in each species by their fitness
+    this.sortSpeciesPlayers = function(){
         for(let species of this.all_species_list){
             species.population.sort((player_a, player_b) => {
                 return player_a.original_fitness - player_b.original_fitness;
             });
         }
     };
+    // Prunes the last n% of players
     this.prunePopulation = function(){
         for(let i=0; i<this.all_species_list.length; i++){
             let species = this.all_species_list[i];
@@ -171,11 +177,37 @@ function Population(){
             }
         }
     };
+    // Calculates the specific fitness for each player in each species
     this.calculateSpecificFitness = function(){
         for(let species of this.all_species_list){
             let species_total_pop = species.population.length;
             for(let player of species.population){
-                player.adjusted_score = player.original_fitness / species_total_pop;
+                player.adjusted_fitness = player.original_fitness / species_total_pop;
+            }
+        }
+    };
+    // Calculates the fitness for each fitness
+    this.calculateSpeciesFitness = function(){
+        let species_total_fitness = 0;
+        for(let species of this.all_species_list){
+            species.calculateSpeciesFitness();
+            species_total_fitness += species.species_fitness;
+        }
+        this.species_total_fitness = species_total_fitness;
+    };
+    this.generateOffspring = function(){
+        // Generating a mating pool of [[player_a, player_b], ...]
+        let mating_pool = [];
+        // Using the sum until over algorithm
+        for(let i=0; i<this.total_pop; i++){
+            // The count_prob will sum the selected_prob of each species, until count_prob > gen_prob
+            let gen_prob = random(),
+            count_prob = 0;
+            for(let species of this.all_species_list){
+                count_prob += species.species_fitness / this.species_total_fitness;
+                if(count_prob >= gen_prob){
+                    mating_pool.push(species.getParents());
+                }
             }
         }
     };
