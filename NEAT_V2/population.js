@@ -73,6 +73,13 @@ function Population(){
         // Set current population as the population generated here
         this.population = population;
     };
+    this.getNewPopulation = function(){
+        this.generateSpecies();
+        this.sortSpecies();
+        this.prunePopulation();
+        this.calculateSpecificFitness();
+        console.log(this.all_species_list);
+    };
     // Main functions
     // Function called to generate a connection_history based on nodes and previously generated connections
     this.generateConnection = function(in_node, out_node){
@@ -119,6 +126,60 @@ function Population(){
             }
         }
     };
+    this.generateSpecies = function(){
+        let all_species_list = [];
+        for(let player of this.population){
+            if(all_species_list.length < 1){
+                let first_species = new Species();
+                first_species.init(player);
+                all_species_list.push(first_species);
+            }
+            else{
+                let shortest_species = all_species_list[0],
+                shortest_distance = this.getDistance(shortest_species.represent, player);
+                for(let species of all_species_list){
+                    if(this.getDistance(species.represent, player) < shortest_distance){
+                        shortest_species = species;
+                        shortest_distance = this.getDistance(shortest_species.represent, player);
+                    }
+                }
+                if(shortest_distance > this.compatibility_threshold){
+                    let new_species = new Species();
+                    new_species.init(player);
+                    all_species_list.push(new_species);
+                }
+                else{
+                    shortest_species.addPlayer(player);
+                }
+            }
+        }
+        this.all_species_list = all_species_list;
+    };
+    this.sortSpecies = function(){
+        for(let species of this.all_species_list){
+            species.population.sort((player_a, player_b) => {
+                return player_a.original_fitness - player_b.original_fitness;
+            });
+        }
+    };
+    this.prunePopulation = function(){
+        for(let i=0; i<this.all_species_list.length; i++){
+            let species = this.all_species_list[i];
+            let prune_number = Math.floor(species.population.length * this.prune_percentage);
+            if(prune_number < species.population.length){
+                species.population.splice(0, prune_number);
+            }
+        }
+    };
+    this.calculateSpecificFitness = function(){
+        for(let species of this.all_species_list){
+            let species_total_pop = species.population.length;
+            for(let player of species.population){
+                player.adjusted_score = player.original_fitness / species_total_pop;
+            }
+        }
+    };
+
     // Utility functions
     this.cloneGlobalNodeHistory = function(){
         let cloned_list = [];
@@ -126,5 +187,70 @@ function Population(){
             cloned_list.push(node_history.clone());
         }
         return cloned_list;
+    };
+    this.getDistance = function(player_a, player_b){
+        let different_connections = 0,
+        total_w_diff = 0;
+        let a_index = 0,
+        b_index = 0;
+        let a_connections = player_a.brain.connections_history_list,
+        b_connections = player_b.brain.connections_history_list;
+        let a_connection_len = a_connections.length,
+        b_connection_len = b_connections.length;
+        let same_connections_number = 0;
+        while(true){
+            if(a_index === a_connection_len && b_index === b_connection_len){
+                break;
+            }
+            else if(a_index === a_connection_len){
+                if(a_connections[a_index - 1].innovation_number === b_connections[b_index].innovation_number){
+                    total_w_diff = Math.abs(a_connections[a_index - 1].weight - b_connections[b_index].weight);
+                    b_index++;
+                    same_connections_number++;
+                }
+                else{
+                    different_connections++;
+                    b_index++;
+                }
+            }
+            else if(b_index === b_connection_len){
+                if(a_connections[a_index].innovation_number === b_connections[b_index - 1].innovation_number){
+                    total_w_diff = Math.abs(a_connections[a_index].weight - b_connections[b_index - 1].weight);
+                    a_index++;
+                    same_connections_number++;
+                }
+                else{
+                    different_connections++;
+                    a_index++;
+                }
+            }
+            if(a_index !== a_connection_len && b_index !== b_connection_len){
+                if(a_connections[a_index].innovation_number === b_connections[b_index].innovation_number){
+                    total_w_diff = Math.abs(a_connections[a_index].weight - b_connections[b_index].weight);
+                    a_index++;
+                    b_index++;
+                    same_connections_number++;
+                }
+                else if(a_connections[a_index].innovation_number < b_connections[b_index].innovation_number){
+                    different_connections++;
+                    a_index++;
+                }
+                else if(a_connections[a_index].innovation_number > b_connections[b_index].innovation_number){
+                    different_connections++;
+                    b_index++;
+                }
+            }
+        }
+        let N = 1;
+        if(a_connection_len >= 20 || b_connection_len >= 20){
+            if(a_connection_len >= b_connection_len){
+                N = a_connection_len;
+            }
+            else{
+                N = b_connection_len;
+            }
+        }
+        let distance = (((this.c1 * different_connections) / N) + (this.c2 * (total_w_diff / same_connections_number)));
+        return distance;
     };
 }

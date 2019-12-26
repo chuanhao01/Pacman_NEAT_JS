@@ -23,6 +23,7 @@ function draw(){
         for(let i=0; i<population.population.length; i++){
             population.population[i].setScore(scores[i]);
         }
+        population.getNewPopulation();
         done = true;
     }
 }
