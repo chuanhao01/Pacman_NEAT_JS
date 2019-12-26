@@ -14,7 +14,7 @@ function Population(){
         this.all_species_list = [];
         this.mating_pool = [];
         this.crossover_population = [];
-        this.population = null;
+        this.population = [];
         this.generation = 1;
         // NEAT configs
         this.mutation_rates = config.mutation_rates;
