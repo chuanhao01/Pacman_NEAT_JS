@@ -7,9 +7,9 @@ function Player(){
     this.enabled = true;
     // Method call to generate the brain for the first generation
     // Usually called by from the population class
-    this.init = function(nodes_history_list, connections_history_list, mutation_rate){
+    this.init = function(nodes_history_list, connections_history_list, mutation_rates, weight_shift_coeff){
         this.brain = new Genome();
-        this.brain.init(nodes_history_list, connections_history_list, mutation_rate);
+        this.brain.init(nodes_history_list, connections_history_list, mutation_rates, weight_shift_coeff);
     };
     /*------------------------------------------------------------------------------------*/
 }
