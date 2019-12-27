@@ -33,7 +33,7 @@ function Player(){
     };
     this.secondMutation = function(global_connection_history_list, global_node_history_list, nodes_history_list){
         this.brain.updateNodesHistoryList(nodes_history_list);
-        this.brain.mutateAddConnection(global_connection_history_list, global_node_history_list);
+        this.brain.mutateAddConnection(global_connection_history_list);
         this.brain.mutateWeights();
         this.brain.mutateEnableConnection();
         this.brain.setup();

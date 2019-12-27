@@ -85,7 +85,7 @@ function Genome(){
     this.mutateAddNode = function(global_connection_history_list, global_node_history_list, global_add_node_mutation_list){
         for(let connection_history of this.connections_history_list){
             if(connection_history.enabled){
-                if (Math.random() < 0.2) {
+                if (Math.random() < this.mutation_rates.add_node) {
                     if (global_add_node_mutation_list.length < 1) {
                         let new_add_node_mutation = new AddNodeMutation();
                         // grabbing nodes from global list
@@ -180,10 +180,10 @@ function Genome(){
     this.updateNodesHistoryList = function(global_node_history_list){
         this.nodes_history_list = global_node_history_list;
     };
-    this.mutateAddConnection = function(global_connection_history_list, global_node_history_list){
+    this.mutateAddConnection = function(global_connection_history_list){
         let possible_nodes_history = this.generateNodeToAddConnections();
         for(let i=0; i<possible_nodes_history.length; i++){
-            if(Math.random() < 0.05){
+            if(Math.random() < this.mutation_rates.add_connection){
                 let node_history_a = possible_nodes_history[Math.floor(Math.random() * possible_nodes_history.length)],
                 node_history_b = possible_nodes_history[Math.floor(Math.random() * possible_nodes_history.length)];
                 while(node_history_a.layer_number === node_history_b.layer_number){
@@ -212,10 +212,10 @@ function Genome(){
     this.mutateWeights = function(){
         for(let connection_history of this.connections_history_list){
             if(connection_history.enabled){
-                if(Math.random() < 0.15){
+                if(Math.random() < this.mutation_rates.shift_weight){
                     connection_history.weight += this.weight_shift_coeff * random(-2, 2);
                 }
-                if(Math.random() < 0.1){
+                if(Math.random() < this.mutation_rates.new_weight){
                     let new_weight = random(-2, 2);
                     connection_history.weight = new_weight;
                 }
@@ -224,7 +224,7 @@ function Genome(){
     };
     this.mutateEnableConnection = function(){
         for(let connection_history of this.connections_history_list){
-            if(Math.random() < 0.2){
+            if(Math.random() < this.mutation_rates.enable_connection){
                 if(!connection_history.cannot_come_back){
                     connection_history.enabled = !connection_history.enabled;
                 }

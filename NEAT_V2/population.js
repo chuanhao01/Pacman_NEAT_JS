@@ -238,6 +238,8 @@ function Population(){
         console.log(`Generation: ${this.generation}`);
         this.generation++;
         this.population = this.crossover_population;
+        console.log(this.global_node_history_list);
+        console.log(this.global_connection_history_list);
         console.log(this.population);
     };
     // Utility functions
