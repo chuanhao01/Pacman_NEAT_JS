@@ -28,6 +28,16 @@ function Player(){
         child.brain = child_brain;
         return child;
     };
+    this.firstMutation = function(global_connection_history_list, global_node_history_list, global_add_node_mutation_list){
+        this.brain.mutateAddNode(global_connection_history_list, global_node_history_list, global_add_node_mutation_list);
+    };
+    this.secondMutation = function(global_connection_history_list, global_node_history_list, nodes_history_list){
+        this.brain.updateNodesHistoryList(nodes_history_list);
+        this.brain.mutateAddConnection(global_connection_history_list, global_node_history_list);
+        this.brain.mutateWeights();
+        this.brain.mutateEnableConnection();
+        this.brain.setup();
+    };
     // Utility function
     this.setScore = function(score){
         this.original_fitness = score;

@@ -82,8 +82,7 @@ function Population(){
         this.calculateSpeciesFitness();
         this.generateMatingPool();
         this.crossoverParents();
-
-        console.log(this.all_species_list);
+        this.mutatePopulation();
     };
     // Main functions
     // Function called to generate a connection_history based on nodes and previously generated connections
@@ -232,13 +231,14 @@ function Population(){
     };
     this.mutatePopulation = function(){
         for(let child of this.crossover_population){
-            child.mutateAddNode(this.global_connection_history_list, this.global_node_history_list, this.global_add_node_mutation_list);
-            child.updateBrainNodesHistoryList(this.cloneGlobalNodeHistory());
-            child.mutateAddConnection(this.global_connection_history_list, this.global_node_history_list);
-            child.mutateWeights();
-            child.mutateEnableConnection();
-            child.setup();           
+            child.firstMutation(this.global_connection_history_list, this.global_node_history_list, this.global_add_node_mutation_list);
+            child.secondMutation(this.global_connection_history_list, this.global_node_history_list, this.cloneGlobalNodeHistory());
         }
+        this.updateGlobalNodeAndInnovation();
+        console.log(`Generation: ${this.generation}`);
+        this.generation++;
+        this.population = this.crossover_population;
+        console.log(this.population);
     };
     // Utility functions
     this.cloneGlobalNodeHistory = function(){
@@ -312,5 +312,9 @@ function Population(){
         }
         let distance = (((this.c1 * different_connections) / N) + (this.c2 * (total_w_diff / same_connections_number)));
         return distance;
+    };
+    this.updateGlobalNodeAndInnovation = function(){
+        this.global_innovation_number = this.global_connection_history_list[this.global_connection_history_list.length - 1].innovation_number + 1;
+        this.global_node_number = this.global_node_history_list[this.global_node_history_list.length - 1].node_number + 1;
     };
 }

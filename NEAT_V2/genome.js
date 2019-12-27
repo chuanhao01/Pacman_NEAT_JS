@@ -79,6 +79,164 @@ function Genome(){
         child_genome.init(this.nodes_history_list, final_connections, this.mutation_rates, this.weight_shift_coeff);
         return child_genome;
     };
+    // Here the global are passed from the population and the generate connection function is also passed down.
+    // We make adjustments directly on these variables by reference
+    // Remeber to update Innovation number and node number at the end
+    this.mutateAddNode = function(global_connection_history_list, global_node_history_list, global_add_node_mutation_list){
+        for(let connection_history of this.connections_history_list){
+            if(connection_history.enabled){
+                if (Math.random() < 0.2) {
+                    if (global_add_node_mutation_list.length < 1) {
+                        let new_add_node_mutation = new AddNodeMutation();
+                        // grabbing nodes from global list
+                        let global_in_node_history = global_node_history_list[connection_history.in_node - 1],
+                            global_out_node_history = global_node_history_list[connection_history.out_node - 1];
+                        // generating new node
+                        let new_node_history = new NodeHistory();
+                        new_node_history.init(global_node_history_list[global_node_history_list.length - 1].node_number + 1, 'hidden', global_in_node_history.layer_number + 1);
+                        // generating new in and out connections
+                        let new_in_connection_history = this.generateConnection(global_in_node_history.node_number, new_node_history.node_number, global_connection_history_list),
+                            new_out_connection_history = this.generateConnection(new_node_history.node_number, global_out_node_history.node_number, global_connection_history_list);
+                        // Pushing new node into global list
+                        // console.log('im adding a new node')
+                        global_node_history_list.push(new_node_history);
+                        // Making the mutation obj
+                        new_add_node_mutation.init(connection_history.clone(), new_in_connection_history, new_out_connection_history);
+                        global_add_node_mutation_list.push(new_add_node_mutation);
+                        // Updating the genome attributes
+                        new_in_connection_history = new_add_node_mutation.new_in_connection_history.clone();
+                        new_out_connection_history = new_add_node_mutation.new_out_connection_history.clone();
+                        new_in_connection_history.weight = 1;
+                        new_out_connection_history.weight = connection_history.weight;
+                        this.connections_history_list.push(new_in_connection_history);
+                        this.connections_history_list.push(new_out_connection_history);
+                        connection_history.enabled = false;
+                        connection_history.cannot_come_back = true;
+                    }
+                    else {
+                        let is_new = true;
+                        for (let add_node_mutation of global_add_node_mutation_list) {
+                            if (connection_history.in_node === add_node_mutation.original_connection_history.in_node && connection_history.out_node === add_node_mutation.original_connection_history.out_node) {
+                                is_new = false;
+                                let new_in_connection_history = add_node_mutation.new_in_connection_history.clone(),
+                                    new_out_connection_history = add_node_mutation.new_out_connection_history.clone();
+                                new_in_connection_history.weight = 1;
+                                new_out_connection_history.weight = connection_history.weight;
+                                this.connections_history_list.push(new_in_connection_history);
+                                this.connections_history_list.push(new_out_connection_history);
+                                connection_history.enabled = false;
+                            }
+                        }
+                        if (is_new) {
+                            let new_add_node_mutation = new AddNodeMutation();
+                            // Grabbing nodes from global list
+                            let global_in_node_history = global_node_history_list[connection_history.in_node - 1],
+                                global_out_node_history = global_node_history_list[connection_history.out_node - 1];
+                            // generating new node
+                            let new_node_history = new NodeHistory();
+                            new_node_history.init(global_node_history_list[global_node_history_list.length - 1].node_number + 1, 'hidden', global_in_node_history.layer_number + 1);
+                            // generating the new connections
+                            let new_in_connection_history = this.generateConnection(global_in_node_history.node_number, new_node_history.node_number, global_connection_history_list),
+                                new_out_connection_history = this.generateConnection(new_node_history.node_number, global_out_node_history.node_number, global_connection_history_list);
+                            // Making the mutation obj
+                            new_add_node_mutation.init(connection_history.clone(), new_in_connection_history, new_out_connection_history);
+                            global_add_node_mutation_list.push(new_add_node_mutation);
+                            if (global_out_node_history.type === 'output') {
+                                new_in_connection_history = new_add_node_mutation.new_in_connection_history.clone();
+                                new_out_connection_history = new_add_node_mutation.new_out_connection_history.clone();
+                                new_in_connection_history.weight = 1;
+                                new_out_connection_history.weight = connection_history.weight;
+                                this.connections_history_list.push(new_in_connection_history);
+                                this.connections_history_list.push(new_out_connection_history);
+                                connection_history.cannot_come_back = true;
+                                connection_history.enabled = false;
+                            }
+                            else {
+                                for (let node_history of global_node_history_list) {
+                                    if (node_history.layer_number >= global_out_node_history.layer_number) {
+                                        // console.log(node_history.clone(), connection_history.clone());
+                                        node_history.layer_number += 1;
+                                    }
+                                }
+                                global_out_node_history.layer_number += 1;
+                                new_in_connection_history = new_add_node_mutation.new_in_connection_history.clone();
+                                new_out_connection_history = new_add_node_mutation.new_out_connection_history.clone();
+                                new_in_connection_history.weight = 1;
+                                new_out_connection_history.weight = connection_history.weight;
+                                this.connections_history_list.push(new_in_connection_history);
+                                this.connections_history_list.push(new_out_connection_history);
+                                connection_history.enabled = false;
+                                connection_history.cannot_come_back = true;
+                            }
+                            // pushing node into global list
+                            // console.log('im also adding a node');
+                            global_node_history_list.push(new_node_history);
+                        }
+                    }
+                }
+            }
+        }
+    };
+    this.updateNodesHistoryList = function(global_node_history_list){
+        this.nodes_history_list = global_node_history_list;
+    };
+    this.mutateAddConnection = function(global_connection_history_list, global_node_history_list){
+        let possible_nodes_history = this.generateNodeToAddConnections();
+        for(let i=0; i<possible_nodes_history.length; i++){
+            if(Math.random() < 0.05){
+                let node_history_a = possible_nodes_history[Math.floor(Math.random() * possible_nodes_history.length)],
+                node_history_b = possible_nodes_history[Math.floor(Math.random() * possible_nodes_history.length)];
+                while(node_history_a.layer_number === node_history_b.layer_number){
+                    node_history_a = possible_nodes_history[Math.floor(Math.random() * possible_nodes_history.length)];
+                    node_history_b = possible_nodes_history[Math.floor(Math.random() * possible_nodes_history.length)];
+                }
+                if(node_history_a.type === 'output'){
+                    let temp_node_history = node_history_b;
+                    node_history_b = node_history_a;
+                    node_history_a = temp_node_history;
+                }
+                else{
+                    if(node_history_a.layer_number > node_history_b.layer_number && node_history_b.layer_number !== -1){
+                        let temp_node_history = node_history_b;
+                        node_history_b = node_history_a;
+                        node_history_a = temp_node_history;
+                    }
+                }
+                if(this.checkConnectionIsNew(node_history_a.node_number, node_history_b.node_number)){
+                    let new_connection_history = this.generateConnection(node_history_a.node_number, node_history_b.node_number, global_connection_history_list);
+                    this.connections_history_list.push(new_connection_history);
+                }
+            }
+        }
+    };
+    this.mutateWeights = function(){
+        for(let connection_history of this.connections_history_list){
+            if(connection_history.enabled){
+                if(Math.random() < 0.15){
+                    connection_history.weight += this.weight_shift_coeff * random(-2, 2);
+                }
+                if(Math.random() < 0.1){
+                    let new_weight = random(-2, 2);
+                    connection_history.weight = new_weight;
+                }
+            }
+        }
+    };
+    this.mutateEnableConnection = function(){
+        for(let connection_history of this.connections_history_list){
+            if(Math.random() < 0.2){
+                if(!connection_history.cannot_come_back){
+                    connection_history.enabled = !connection_history.enabled;
+                }
+            }
+        }
+    };
+    this.setup = function(){
+        // console.log(this.nodes_genes_list);
+        this.sortConnectionsHistory();
+        this.generateNodeGenes();
+        this.generateConnectionGenes();
+    };
     // Utility functions
     // This sorts this.connection_history_list by innovation number
     this.sortConnectionsHistory = function(){
@@ -173,4 +331,65 @@ function Genome(){
         }
         return outputs;
     };
+    this.generateConnection = function(in_node, out_node, global_connection_history_list){
+        let is_new = true,
+        old_connection;
+        for(let connection_history of global_connection_history_list){
+            if(connection_history.in_node === in_node && connection_history.out_node === out_node){
+                is_new = false;
+                old_connection = connection_history.clone();
+                let new_weight = random(-2, 2);
+                old_connection.weight = new_weight;
+            }
+        }
+        if(is_new){
+            let new_connection_history = new ConnectionHistory();
+            let weight = random(-2, 2);
+            new_connection_history.init(in_node, out_node, weight, global_connection_history_list[global_connection_history_list.length - 1].innovation_number + 1);
+            global_connection_history_list.push(new_connection_history);
+            return new_connection_history.clone();
+        }
+        else{
+            return old_connection;
+        }
+    };
+    this.generateNodeToAddConnections = function(){
+        let possible_nodes_history = [];
+        for(let connection_history of this.connections_history_list){
+            let in_node = this.nodes_history_list[connection_history.in_node - 1].clone(),
+            out_node = this.nodes_history_list[connection_history.out_node - 1].clone();
+            if(possible_nodes_history.length < 1){
+                possible_nodes_history.push(in_node);
+                possible_nodes_history.push(out_node);
+            }
+            else{
+                let add_in = true,
+                add_out = true;
+                for(let nodes_history of possible_nodes_history){
+                    if(nodes_history.node_number === in_node.node_number){
+                        add_in = false;
+                    }
+                    if(nodes_history.node_number === out_node.node_number){
+                        add_out = false
+                    }
+                }
+                if(add_in){
+                    possible_nodes_history.push(in_node);
+                }
+                if(add_out){
+                    possible_nodes_history.push(out_node);
+                }
+            }
+        }
+        return possible_nodes_history;
+    };
+    this.checkConnectionIsNew = function(in_node, out_node){
+        for(let connection_history of this.connections_history_list){
+            if(connection_history.in_node === in_node && connection_history.out_node === out_node){
+                return false;
+            }
+        }
+        return true;
+    };
+
 }
