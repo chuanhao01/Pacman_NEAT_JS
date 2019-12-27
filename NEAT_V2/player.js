@@ -21,6 +21,13 @@ function Player(){
             return outputs;
         }
     };
+    this.breed = function(player){
+        // Creating the child brain
+        let child_brain = this.brain.crossover(player.brain);
+        let child = new Player();
+        child.brain = child_brain;
+        return child;
+    };
     // Utility function
     this.setScore = function(score){
         this.original_fitness = score;

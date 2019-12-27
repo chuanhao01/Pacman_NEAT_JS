@@ -37,6 +37,48 @@ function Genome(){
         const outputs = this.getOutput();
         return outputs;
     };
+    this.crossover = function(genome){
+        genome.sortConnectionsHistory();
+        this.sortConnectionsHistory();
+        let a_index = 0,
+        b_index = 0;
+        let a_connections = genome.connections_history_list, 
+        b_connections = this.connections_history_list;
+        let a_connection_len = a_connections.length,
+        b_connection_len = b_connections.length;
+        let final_connections = [];
+        while(true){
+            if(a_index === a_connection_len || b_index === b_connection_len){
+                if(b_index === b_connection_len){
+                    break;
+                }
+                else if(a_index === a_connection_len){
+                    final_connections.push(b_connections[b_index].clone());
+                    b_index++;
+                }
+            }
+            else if(b_index !== b_connection_len){
+                if(a_connections[a_index].innovation_number === b_connections[b_index].innovation_number){
+                    final_connections.push(b_connections[b_index].clone());
+                    a_index++;
+                    b_index++;
+                }
+                else if(a_connections[a_index].innovation_number < b_connections[b_index].innovation_number){
+                    final_connections.push(a_connections[a_index].clone());
+                    a_index++;
+                }
+                else if(a_connections[a_index].innovation_number > b_connections[b_index].innovation_number){
+                    final_connections.push(b_connections[b_index].clone());
+                    b_index++;
+                }
+            }
+        } 
+        // Making new child brain
+        // Still need to update connections and nodes at the end after mutation
+        let child_genome = new Genome();
+        child_genome.init(this.nodes_history_list, final_connections, this.mutation_rates, this.weight_shift_coeff);
+        return child_genome;
+    };
     // Utility functions
     // This sorts this.connection_history_list by innovation number
     this.sortConnectionsHistory = function(){

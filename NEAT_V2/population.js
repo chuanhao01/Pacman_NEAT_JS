@@ -13,6 +13,7 @@ function Population(){
         this.population = [];
         this.all_species_list = [];
         this.species_total_fitness = 0;
+        this.mating_pool = [];
         this.crossover_population = [];
         this.population = [];
         this.generation = 1;
@@ -79,7 +80,8 @@ function Population(){
         this.prunePopulation();
         this.calculateSpecificFitness();
         this.calculateSpeciesFitness();
-        this.generateOffspring();
+        this.generateMatingPool();
+        this.crossoverParents();
 
         console.log(this.all_species_list);
     };
@@ -195,7 +197,7 @@ function Population(){
         }
         this.species_total_fitness = species_total_fitness;
     };
-    this.generateOffspring = function(){
+    this.generateMatingPool = function(){
         // Generating a mating pool of [[player_a, player_b], ...]
         let mating_pool = [];
         // Using the sum until over algorithm
@@ -210,8 +212,34 @@ function Population(){
                 }
             }
         }
+        this.mating_pool = mating_pool;
     };
-
+    this.crossoverParents = function(){
+        let crossover_population = [];
+        for(let parents of this.mating_pool){
+            let parent_a = parents[0],
+            parent_b = parents[1];
+            let child_player;
+            if(parent_a.adjusted_fitness > parent_b.adjusted_fitness){
+                child_player = parent_a.breed(parent_b);
+            }
+            else{
+                child_player = parent_b.breed(parent_a);
+            }
+            crossover_population.push(child_player);
+        }
+        this.crossover_population = crossover_population;
+    };
+    this.mutatePopulation = function(){
+        for(let child of this.crossover_population){
+            child.mutateAddNode(this.global_connection_history_list, this.global_node_history_list, this.global_add_node_mutation_list);
+            child.updateBrainNodesHistoryList(this.cloneGlobalNodeHistory());
+            child.mutateAddConnection(this.global_connection_history_list, this.global_node_history_list);
+            child.mutateWeights();
+            child.mutateEnableConnection();
+            child.setup();           
+        }
+    };
     // Utility functions
     this.cloneGlobalNodeHistory = function(){
         let cloned_list = [];
