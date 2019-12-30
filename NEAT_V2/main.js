@@ -1,14 +1,11 @@
 const population = new Population();
-let player = null;
 let count = 0,
 done = false;
-const inputs = [0, 0, 0, 0, 0, 0, 0, 0];
 let scores = [];
 function setup(){
     population.init(NEAT_CONFIGS);
     population.initPopualtion();
     console.log(population.population);
-    player = population.population[0];
     for(let i=0; i<population.population.length; i++){
         scores.push(Math.floor(random(0, 100)));
     }
