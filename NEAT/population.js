@@ -243,7 +243,7 @@ function Population(){
             let a_spec_index = 0,
             b_spec_index = 0;
             for(let i=0; i<this.all_species_list.length; i++){
-                let species = this.all_species_list[i]
+                let species = this.all_species_list[i];
                 for(let bird of species.population){
                     if(bird === bird_a){
                         a_spec_index = i;

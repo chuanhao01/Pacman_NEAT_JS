@@ -28,7 +28,7 @@ function Population(){
         this.input_nodes = config.input_nodes;
         this.output_nodes = config.output_nodes;
     };
-    this.initPopualtion = function(){
+    this.initPopulation = function(){
         // Getting the number of input and output nodes from config file
         let input_nodes = this.input_nodes,
         output_nodes = this.output_nodes;
@@ -92,7 +92,7 @@ function Population(){
         if(this.global_connection_history_list.length < 1){
             // Generate connection
             let first_connection = new ConnectionHistory();
-            let weight = random(-2, 2);
+            let weight = randomNumber(-2, 2);
             first_connection.init(in_node, out_node, weight, this.global_innovation_number);
             // Update global connection history
             this.global_connection_history_list.push(first_connection);
@@ -108,7 +108,7 @@ function Population(){
                 if(connection.in_node === in_node && connection.out_node === out_node){
                     is_new = false;
                     old_connection = connection.clone();
-                    let new_weight = random(-2, 2);
+                    let new_weight = randomNumber(-2, 2);
                     old_connection.weight = new_weight;
                 }
             }
@@ -116,7 +116,7 @@ function Population(){
             if(is_new){
                 // Gen
                 let new_connection = new ConnectionHistory();
-                let weight = random(-2, 2);
+                let weight = randomNumber(-2, 2);
                 new_connection.init(in_node, out_node, weight, this.global_innovation_number);
                 // Update
                 this.global_connection_history_list.push(new_connection);
@@ -187,7 +187,7 @@ function Population(){
             }
         }
     };
-    // Calculates the fitness for each fitness
+    // Calculates the fitness for each species
     this.calculateSpeciesFitness = function(){
         let species_total_fitness = 0;
         for(let species of this.all_species_list){
@@ -202,7 +202,7 @@ function Population(){
         // Using the sum until over algorithm
         for(let i=0; i<this.total_pop; i++){
             // The count_prob will sum the selected_prob of each species, until count_prob > gen_prob
-            let gen_prob = random(),
+            let gen_prob = randomNumber(0, 1),
             count_prob = 0;
             for(let species of this.all_species_list){
                 count_prob += species.species_fitness / this.species_total_fitness;
@@ -238,9 +238,15 @@ function Population(){
         console.log(`Generation: ${this.generation}`);
         this.generation++;
         this.population = this.crossover_population;
-        console.log(this.global_node_history_list);
-        console.log(this.global_connection_history_list);
-        console.log(this.population);
+
+        this.all_species_list = [];
+        this.species_total_fitness = 0;
+        this.mating_pool = [];
+        this.crossover_population = [];
+        // console.log(this.global_node_history_list);
+        // console.log(this.global_connection_history_list);
+        // console.log(this.population);
+        console.log('\n');
     };
     // Utility functions
     this.cloneGlobalNodeHistory = function(){

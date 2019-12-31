@@ -1,26 +1,63 @@
 const population = new Population();
 let count = 0,
 done = false;
-let scores = [];
-function setup(){
-    population.init(NEAT_CONFIGS);
-    population.initPopualtion();
-    console.log(population.population);
-    for(let i=0; i<population.population.length; i++){
-        scores.push(Math.floor(random(0, 100)));
-    }
-}
+let inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
+let y = [0, 1, 1, 0];
 
-function draw(){
-    if(count < 5 && !done){
-        // player.play(inputs);
-        count++;
-    }else if(!done){
-        // Kill all the players and set their score
-        for(let i=0; i<population.population.length; i++){
-            population.population[i].setScore(scores[i]);
+population.init(NEAT_CONFIGS);
+population.initPopulation();
+for(let i=0; i<5; i++){
+    for(let i=0; i<inputs.length; i++){
+        for(let player of population.population){
+            let output = player.play(inputs[i]);
+            output = sigmoidActivation(output[0]);
+            let loss = binCrossEntropy(y[i], output);
+            let fitness = 1/loss;
+            player.original_fitness += fitness;
         }
-        population.getNewPopulation();
-        done = true;
     }
+    for(let player of population.population){
+        player.setScore(player.original_fitness / 4);
+    }
+    console.log(population.population);
+    population.getNewPopulation();
 }
+console.log('done');
+// function setup(){
+//     population.init(NEAT_CONFIGS);
+//     population.initPopualtion();
+//     // for(let i=0; i<inputs.length; i++){
+//     //     for(let player of population.population){
+//     //         let output = player.play(inputs[i]);
+//     //         let loss = binCrossEntropy(y[i], output);
+//     //         let fitness = 1/loss;
+//     //         player.original_fitness += fitness;
+//     //     }
+//     // }
+//     // for(let player of population.population){
+//     //     player.setScore(player.original_fitness / 4);
+//     // }
+//     // population.getNewPopulation();
+
+//     // for(let i=0; i<100; i++){
+//     //     for(let i=0; i<inputs.length; i++){
+//     //         for(let player of population.population){
+//     //             let output = player.play(inputs[i]);
+//     //             output = sigmoidActivation(output[0]);
+//     //             let loss = binCrossEntropy(y[i], output);
+//     //             let fitness = 1/loss;
+//     //             player.original_fitness += fitness;
+//     //         }
+//     //     }
+//     //     for(let player of population.population){
+//     //         player.setScore(player.original_fitness / 4);
+//     //     }
+//     //     population.getNewPopulation();
+//     // }
+//     // console.log('done');
+// }
+
+// function draw(){
+
+// }
+
