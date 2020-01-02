@@ -48,4 +48,12 @@ function Player(){
         player.brain = this.brain;
         return player;
     };
+    this.savePlayer = function(){
+        const player = this.clone();
+        return stringify(player.brain);
+    };
+    this.loadPlayer = function(model){
+        this.brain = new Genome();
+        this.brain.loadBrain(model);
+    };
 }

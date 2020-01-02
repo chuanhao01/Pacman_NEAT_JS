@@ -370,7 +370,7 @@ function Genome(){
                         add_in = false;
                     }
                     if(nodes_history.node_number === out_node.node_number){
-                        add_out = false
+                        add_out = false;
                     }
                 }
                 if(add_in){
@@ -391,5 +391,17 @@ function Genome(){
         }
         return true;
     };
-
+    this.loadBrain = function(model){
+        this.weight_shift_coeff = model.weight_shift_coeff;
+        this.nodes_history_list = model.nodes_history_list;
+        this.connections_history_list = model.connections_history_list;
+        this.mutation_rates = model.mutation_rates;
+        this.nodes_genes_list = model.nodes_genes_list;
+        this.connections_genes_list = model.connections_genes_list;
+        this.nodes_genes_needed = model.nodes_genes_needed;
+        this.sortConnectionsHistory();
+        this.generateNodeGenes();
+        this.generateConnectionGenes();
+        this.generateNodesGenesNeeded();
+    };
 }
