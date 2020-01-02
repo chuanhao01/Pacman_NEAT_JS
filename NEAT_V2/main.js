@@ -1,7 +1,7 @@
 const population = new Population();
 let inputs = [];
 
-for(let i=0; i<100; i += 0.5){
+for(let i=0.01; i<1; i += 0.1){
     inputs.push(i);
 }
 
@@ -13,8 +13,7 @@ function setup(){
     for(let i=0; i<inputs.length; i++){
         for(let player of population.population){
             let output = player.play([inputs[i]]);
-            let fitness = Math.abs((inputs[i] ** 2) - output[0]);
-            fitness = 1 / fitness;
+            let fitness = 1 / Math.sqrt(((inputs[i] ** 2) - output[0]) ** 2);
             player.original_fitness += fitness;
         }
     }
@@ -23,16 +22,15 @@ function setup(){
     }
     let best_player = population.getBestPlayer();
     best_player.enabled = true;
-    console.log(best_player.play([50]), 50**2);
+    console.log(best_player.play([0.5]), 0.5**2);
     console.log(best_player.original_fitness);
     population.getNewPopulation();
 
-    for(let i=0; i<50; i++){
+    for(let i=0; i<60; i++){
         for(let i=0; i<inputs.length; i++){
             for(let player of population.population){
                 let output = player.play([inputs[i]]);
-                let fitness = (inputs[i] ** 2) - output[0];
-                fitness = 1 / fitness;
+                let fitness = 1 / Math.sqrt(((inputs[i] ** 2) - output[0]) ** 2);
                 player.original_fitness += fitness;
             }
         }
@@ -44,8 +42,7 @@ function setup(){
     for(let i=0; i<inputs.length; i++){
         for(let player of population.population){
             let output = player.play([inputs[i]]);
-            let fitness = (inputs[i] ** 2) - output[0];
-            fitness = 1 / fitness;
+            let fitness = 1 / Math.sqrt(((inputs[i] ** 2) - output[0]) ** 2);
             player.original_fitness += fitness;
         }
     }
@@ -54,7 +51,7 @@ function setup(){
     }
     best_player = population.getBestPlayer();
     best_player.enabled = true;
-    console.log(best_player.play([50]), 50**2);
+    console.log(best_player.play([0.5]), 0.5**2);
     console.log(best_player.original_fitness);
     console.log('done');
 
