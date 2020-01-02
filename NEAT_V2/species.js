@@ -23,7 +23,7 @@ function Species(){
         }
     };
     this.randomlyPickPlayer = function(){
-        let gen_prob = random(),
+        let gen_prob = randomNumber(0 ,1),
         count_prob = 0;
         for(let player of this.population){
             count_prob += player.adjusted_fitness / this.species_fitness;

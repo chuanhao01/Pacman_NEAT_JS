@@ -28,7 +28,7 @@ function Population(){
         this.input_nodes = config.input_nodes;
         this.output_nodes = config.output_nodes;
     };
-    this.initPopualtion = function(){
+    this.initPopulation = function(){
         // Getting the number of input and output nodes from config file
         let input_nodes = this.input_nodes,
         output_nodes = this.output_nodes;
@@ -81,7 +81,7 @@ function Population(){
         this.calculateSpecificFitness();
         this.calculateSpeciesFitness();
         this.generateMatingPool();
-        this.crossoverParents();
+        this.crossoverPopulation();
         this.mutatePopulation();
     };
     // Main functions
@@ -92,7 +92,7 @@ function Population(){
         if(this.global_connection_history_list.length < 1){
             // Generate connection
             let first_connection = new ConnectionHistory();
-            let weight = random(-2, 2);
+            let weight = randomNumber(-2, 2);
             first_connection.init(in_node, out_node, weight, this.global_innovation_number);
             // Update global connection history
             this.global_connection_history_list.push(first_connection);
@@ -102,13 +102,12 @@ function Population(){
         // If there are already other connections
         else{
             // Checking through all connections to see if the connection has been made before
-            let is_new = true,
-            old_connection;
+            let is_new = true, old_connection;
             for(let connection of this.global_connection_history_list){
                 if(connection.in_node === in_node && connection.out_node === out_node){
                     is_new = false;
                     old_connection = connection.clone();
-                    let new_weight = random(-2, 2);
+                    let new_weight = randomNumber(-2, 2);
                     old_connection.weight = new_weight;
                 }
             }
@@ -116,7 +115,7 @@ function Population(){
             if(is_new){
                 // Gen
                 let new_connection = new ConnectionHistory();
-                let weight = random(-2, 2);
+                let weight = randomNumber(-2, 2);
                 new_connection.init(in_node, out_node, weight, this.global_innovation_number);
                 // Update
                 this.global_connection_history_list.push(new_connection);
@@ -187,7 +186,7 @@ function Population(){
             }
         }
     };
-    // Calculates the fitness for each fitness
+    // Calculates the fitness for each species
     this.calculateSpeciesFitness = function(){
         let species_total_fitness = 0;
         for(let species of this.all_species_list){
@@ -196,34 +195,36 @@ function Population(){
         }
         this.species_total_fitness = species_total_fitness;
     };
-    this.generateMatingPool = function(){
-        // Generating a mating pool of [[player_a, player_b], ...]
+    this.generateMatingPool= function(){
         let mating_pool = [];
-        // Using the sum until over algorithm
-        for(let i=0; i<this.total_pop; i++){
-            // The count_prob will sum the selected_prob of each species, until count_prob > gen_prob
-            let gen_prob = random(),
-            count_prob = 0;
-            for(let species of this.all_species_list){
-                count_prob += species.species_fitness / this.species_total_fitness;
-                if(count_prob >= gen_prob){
-                    mating_pool.push(species.getParents());
+        let highest_score = 0;
+        for(let species of this.all_species_list){
+            if(species.population[species.population.length - 1].adjusted_fitness > highest_score){
+                highest_score = species.population[species.population.length - 1].adjusted_fitness;
+            }
+        }
+        for(let species of this.all_species_list){
+            for(let player of species.population){
+                let mating_score = Math.floor(map(player.adjusted_fitness, 0, highest_score, 0, 100));
+                for(let i=0; i<mating_score; i++){
+                    mating_pool.push(player);
                 }
             }
         }
         this.mating_pool = mating_pool;
     };
-    this.crossoverParents = function(){
+    this.crossoverPopulation = function(){
         let crossover_population = [];
-        for(let parents of this.mating_pool){
-            let parent_a = parents[0],
-            parent_b = parents[1];
+        for(let i=0; i<this.total_pop; i++){
+            let selected_players = this.selectFromSameSpecies();
+            let player_a = selected_players[0],
+            player_b = selected_players[1];
             let child_player;
-            if(parent_a.adjusted_fitness > parent_b.adjusted_fitness){
-                child_player = parent_a.breed(parent_b);
+            if(player_a.adjusted_fitness > player_b.adjusted_fitness){
+                child_player = player_a.breed(player_b);
             }
             else{
-                child_player = parent_b.breed(parent_a);
+                child_player = player_b.breed(player_a);
             }
             crossover_population.push(child_player);
         }
@@ -238,9 +239,15 @@ function Population(){
         console.log(`Generation: ${this.generation}`);
         this.generation++;
         this.population = this.crossover_population;
-        console.log(this.global_node_history_list);
-        console.log(this.global_connection_history_list);
-        console.log(this.population);
+
+        this.all_species_list = [];
+        this.species_total_fitness = 0;
+        this.mating_pool = [];
+        this.crossover_population = [];
+        // console.log(this.global_node_history_list);
+        // console.log(this.global_connection_history_list);
+        // console.log(this.population);
+        console.log('\n');
     };
     // Utility functions
     this.cloneGlobalNodeHistory = function(){
@@ -319,4 +326,38 @@ function Population(){
         this.global_innovation_number = this.global_connection_history_list[this.global_connection_history_list.length - 1].innovation_number + 1;
         this.global_node_number = this.global_node_history_list[this.global_node_history_list.length - 1].node_number + 1;
     };
+    this.selectFromSameSpecies = function(){
+        let player_a = this.mating_pool[Math.floor(random(this.mating_pool.length))],
+        player_b = this.mating_pool[Math.floor(random(this.mating_pool.length))];
+        while(true){
+            let a_spec_index = 0,
+            b_spec_index = 0;
+            for(let i=0; i<this.all_species_list.length; i++){
+                let species = this.all_species_list[i];
+                for(let bird of species.population){
+                    if(bird === player_a){
+                        a_spec_index = i;
+                    }
+                    if(bird === player_b){
+                        b_spec_index = i;
+                    }
+                }
+            }
+            if(a_spec_index === b_spec_index){
+                return [player_a, player_b];     
+            }
+            player_a = this.mating_pool[Math.floor(random(this.mating_pool.length))];
+            player_b = this.mating_pool[Math.floor(random(this.mating_pool.length))];
+        }
+    };
+    this.getBestPlayer = function(){
+        let best_player = this.population[0];
+        for(let player of this.population){
+            if(best_player.adjusted_fitness < player.adjusted_fitness){
+                best_player = player;
+            }
+        }
+        return best_player;
+    };
+    /* -------------------------------------------------------------------------------------------- */
 }

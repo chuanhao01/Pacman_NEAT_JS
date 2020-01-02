@@ -213,10 +213,10 @@ function Genome(){
         for(let connection_history of this.connections_history_list){
             if(connection_history.enabled){
                 if(Math.random() < this.mutation_rates.shift_weight){
-                    connection_history.weight += this.weight_shift_coeff * random(-2, 2);
+                    connection_history.weight += this.weight_shift_coeff * randomNumber(-2, 2);
                 }
                 if(Math.random() < this.mutation_rates.new_weight){
-                    let new_weight = random(-2, 2);
+                    let new_weight = randomNumber(-2, 2);
                     connection_history.weight = new_weight;
                 }
             }
@@ -338,13 +338,13 @@ function Genome(){
             if(connection_history.in_node === in_node && connection_history.out_node === out_node){
                 is_new = false;
                 old_connection = connection_history.clone();
-                let new_weight = random(-2, 2);
+                let new_weight = randomNumber(-2, 2);
                 old_connection.weight = new_weight;
             }
         }
         if(is_new){
             let new_connection_history = new ConnectionHistory();
-            let weight = random(-2, 2);
+            let weight = randomNumber(-2, 2);
             new_connection_history.init(in_node, out_node, weight, global_connection_history_list[global_connection_history_list.length - 1].innovation_number + 1);
             global_connection_history_list.push(new_connection_history);
             return new_connection_history.clone();
