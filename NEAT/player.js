@@ -43,4 +43,9 @@ function Player(){
         this.original_fitness = score;
         this.enabled = false;
     };
+    this.clone = function(){
+        let player = new Player();
+        player.brain = this.brain;
+        return player;
+    };
 }
