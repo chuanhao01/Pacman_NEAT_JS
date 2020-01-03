@@ -1,7 +1,7 @@
 /**
  * File: Sketch.js 
  * --------------------
- * Main program for the PacMan game
+ * Testing file for NEAT x PACMAN
  */
 
 // Constants used for the game
@@ -13,8 +13,8 @@ let tileRep;
 // Maze image 
 let mazeImg;
 
-// game object
-let game = new Game();
+// game object array
+let gameArr = [];
 
 // NEAT population
 const population = new Population();
@@ -35,17 +35,39 @@ function preload() {
 
 
 function setup() {
-    // init the game
-    game.init(GAME_CONSTS, mazeImg, tileRep);
+    // setting up NEAT population
+    population.init(NEAT_CONFIGS);
+    population.initPopulation();
+
+    // init the game array
+    for (let i = 0; i < 20; i++) {
+        gameArr.push(new Game());
+        gameArr[i].init(GAME_CONSTS, mazeImg, tileRep);
+    }
 }
 
 function draw() {
-    if(game.gameOver) {
-        noLoop();
+    // if(game.gameOver) {
+    //     noLoop();
+    // }
+    // console.log(game.generateInputs());
+    // game.run();
+    // game.show();
+    for (let i = gameArr.length - 1; i >= 0; i--) {
+        // if the game instance is over, splice it out of the game array
+        if (gameArr[i].gameOver) {
+            gameArr.splice(i, 1);
+        } else {
+            console.log(`Population no: ${i + 1}`);
+            console.log(softMax(population.population[i].play(gameArr[i].generateInputs())));
+            // if not, run and show the game instance
+            gameArr[i].run();
+            gameArr[i].show();
+        }
     }
-    console.log(game.generateInputs());
-    game.run();
-    game.show();
+
+    // Right before splicing the game when game is over, call population.population[i].setScore(fitnessScore)
+    // After every game instance is over, call population.getNewPopulation(); to get new population
 
     // // Game events execution order
     // // ---------------------------

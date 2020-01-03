@@ -492,7 +492,7 @@ class Game {
                 } else {
                     inputs.push(0);
                 }
-            } else if(i == 1) {
+            } else if (i == 1) {
                 // check if pinky is frightened
                 // if she is, add 1 to inputs
                 if (this.pinky.mode.frightened) {
@@ -501,7 +501,7 @@ class Game {
                     inputs.push(0);
                 }
 
-            } else if(i == 2) {
+            } else if (i == 2) {
                 // check if inky is frightened
                 // if he is, add 1 to inputs
                 if (this.inky.mode.frightened) {
@@ -510,7 +510,7 @@ class Game {
                     inputs.push(0);
                 }
 
-            } else if(i == 3) {
+            } else if (i == 3) {
                 // check if clyde is frightened
                 // if he is, add 1 to inputs
                 if (this.clyde.mode.frightened) {
@@ -533,8 +533,45 @@ class Game {
     }
 
     // handle outputs from neural network
-    // receives output from neural network
-    handleOutputs() {
+    // receives outputs from neural network
+    handleOutputs(outputs) {
+        // var to store the smallest probablity of dangers from outputs
+        let smallestProbOfDanger = Infinity;
+
+        // var to store the index of the smallest probability of danger
+        let index = 0;
+
+        // new direction vector
+        let directionVect = null;
+
+        // get the index of the smallest prob
+        for (let i = 0; i < outputs.length; i++) {
+            if (smallestProbOfDanger > outputs[i]) {
+                smallestProbOfDanger = outputs[i];
+                index = i;
+            }
+        }
+
+        // after getting the index,
+        // map it to direction
+        // 0:UP
+        // 1:DOWN
+        // 2:LEFT
+        // 3:RIGHT
+        if (index == 0) {
+            directionVect = createVector(0, -1);
+
+        } else if (index == 1) {
+            directionVect = createVector(0, 1);
+
+        } else if (index == 2) {
+            directionVect = createVector(0, -1);
+
+        } else if (index == 3) {
+            directionVect = createVector(0, -1);
+        }
+
+
 
     }
 

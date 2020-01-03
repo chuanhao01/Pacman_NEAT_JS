@@ -1,6 +1,6 @@
 const NEAT_CONFIGS = {
     // Populations configurations
-    total_pop: 10,
+    total_pop: 20,
     // NEAT configurations
     mutation_rates: {
         add_node: 0.001,
@@ -15,6 +15,6 @@ const NEAT_CONFIGS = {
     compatibility_threshold: 2.5,
     prune_percentage: 0.5,
     // Genome configs
-    input_nodes: 7,
-    output_nodes: 1,
+    input_nodes: 17,
+    output_nodes: 4,
 };
