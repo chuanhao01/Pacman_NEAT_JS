@@ -1,14 +1,37 @@
 function NEAT_VISUAL(){
-    this.init = function(player){
+    this.init = function(player, top_left){
         this.player = player;
+        /*
+        top_left current_pos is an object of
+        {
+            'x': float,
+            'y': float
+        }
+        */
+        this.top_left = top_left;
     };
     // Main functions
     this.getModelVisual = function(){
+        // Define and init data
+        let matrix_data = [];
+        // Get data from player
         let nodes_needed = this.player.brain.nodes_genes_needed,
         connections = this.player.brain.connections_history_list;
         let max_layer = this.player.brain.getMaxLayer();
+        // Getting the layers needed
         let layers = this.getLayers(nodes_needed, max_layer);
+        // Getting the connnection needed
         let connections_needed = this.getEnabledConnections(connections);
+        // Sorting the layers
+        layers.sort(function(a, b){
+            return a.layer_number - b.layer_number;
+        });
+        // Generate the matrix here
+        matrix_data = this.genMatrixData(layers);
+        // Draw the matrix
+
+        console.table(matrix_data);
+
         console.log(layers);
         console.log(connections_needed);
     };
@@ -57,5 +80,40 @@ function NEAT_VISUAL(){
             }
         }
         return enabled_connections;
+    };
+    this.genMatrixData = function(layers){
+        let matrix_data = [];
+        let x = 0,
+        y = 0;
+        // Getting the y value
+        // Setting y here
+        for(let layer of layers){
+            if(layer.nodes.length > y){
+                y = layer.nodes.length;
+            }
+        }
+        // Setting x here
+        x = layers.length;
+        for(let i=0; i<y; i++){
+            let row = [];
+            for(let j=0; j<x; j++){
+                if(i < layers[j].nodes.length){
+                    // If you are able to index the node here
+                    row.push(layers[j].nodes[i]);
+                }
+                else{
+                    row.push(0);
+                }
+            }
+            matrix_data.push(row);
+        }
+        return matrix_data;
+    };
+    this.drawMatrix = function(matrix_data){
+        for(let y=0; y<matrix_data.length; y++){
+            for(let x=0; x<matrix_data[y].length; x++){
+                return;
+            }
+        }
     };
 }
