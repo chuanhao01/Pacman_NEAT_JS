@@ -1,6 +1,6 @@
 const NEAT_CONFIGS = {
     // Populations configurations
-    total_pop: 100,
+    total_pop: 10,
     // NEAT configurations
     mutation_rates: {
         add_node: 0.001,

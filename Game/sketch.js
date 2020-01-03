@@ -16,6 +16,9 @@ let mazeImg;
 // game object
 let game = new Game();
 
+// NEAT population
+const population = new Population();
+
 function preload() {
     // load the maze image
     mazeImg = loadImage("./assets/map.jpg");
