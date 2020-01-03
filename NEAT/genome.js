@@ -393,12 +393,27 @@ function Genome(){
     };
     this.loadBrain = function(model){
         this.weight_shift_coeff = model.weight_shift_coeff;
-        this.nodes_history_list = model.nodes_history_list;
-        this.connections_history_list = model.connections_history_list;
         this.mutation_rates = model.mutation_rates;
-        this.nodes_genes_list = model.nodes_genes_list;
-        this.connections_genes_list = model.connections_genes_list;
-        this.nodes_genes_needed = model.nodes_genes_needed;
+
+        let nodes_history_list = [],
+        connections_history_list = [];
+        for(let node_history_data of model.nodes_history_list){
+            let node_history = new NodeHistory();
+            node_history.load(node_history_data);
+            nodes_history_list.push(node_history);
+        }
+        for(let connection_history_data of model.connections_history_list){
+            let connection_history = new ConnectionHistory();
+            connection_history.load(connection_history_data);
+            connections_history_list.push(connection_history);
+        }
+        
+        this.nodes_history_list = nodes_history_list;
+        this.connections_history_list = connections_history_list;
+
+        this.nodes_genes_list = [];
+        this.connections_genes_list = [];
+        this.nodes_genes_needed = [];
         this.sortConnectionsHistory();
         this.generateNodeGenes();
         this.generateConnectionGenes();
