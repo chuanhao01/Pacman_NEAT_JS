@@ -9,6 +9,10 @@ function NEAT_VISUAL(){
         }
         */
         this.top_left = top_left;
+        this.starting_pos = {
+            'y': top_left.y + 25,
+            'x': top_left.x + 25
+        };
     };
     // Main functions
     this.getModelVisual = function(){
@@ -29,7 +33,7 @@ function NEAT_VISUAL(){
         // Generate the matrix here
         matrix_data = this.genMatrixData(layers);
         // Draw the matrix
-
+        this.drawMatrix(matrix_data);
         console.table(matrix_data);
 
         console.log(layers);
@@ -110,9 +114,15 @@ function NEAT_VISUAL(){
         return matrix_data;
     };
     this.drawMatrix = function(matrix_data){
+        // You get it
         for(let y=0; y<matrix_data.length; y++){
             for(let x=0; x<matrix_data[y].length; x++){
-                return;
+                let y_pos = 60 * y + this.starting_pos.y,
+                x_pos = 60 * x + this.starting_pos.x;
+                if(matrix_data[y][x] !== 0){
+                    fill(255);
+                    circle(x_pos, y_pos, 20);
+                }
             }
         }
     };
