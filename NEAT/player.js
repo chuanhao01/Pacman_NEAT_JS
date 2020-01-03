@@ -48,4 +48,18 @@ function Player(){
         player.brain = this.brain;
         return player;
     };
+    this.savePlayer = function(){
+        const player = this.clone();
+        let model = {
+            'nodes_history_list': player.brain.nodes_history_list,
+            'connections_history_list': player.brain.connections_history_list,
+            'mutation_rate': player.brain.mutation_rates,
+            'weight_shift_coeff': player.brain.weight_shift_coeff
+        };
+        return JSON.stringify(model);
+    };
+    this.loadPlayer = function(model){
+        this.brain = new Genome();
+        this.brain.loadBrain(model);
+    };
 }
