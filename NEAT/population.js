@@ -353,7 +353,7 @@ function Population(){
     this.getBestPlayer = function(){
         let best_player = this.population[0];
         for(let player of this.population){
-            if(best_player.adjusted_fitness < player.adjusted_fitness){
+            if(player.original_fitness > best_player.original_fitness){
                 best_player = player;
             }
         }

@@ -14,4 +14,12 @@ function ConnectionHistory(){
         new_connection_history.enabled = this.enabled;
         return new_connection_history;
     };
+    this.load = function(model){
+        this.in_node = model.in_node;
+        this.out_node = model.out_node;
+        this.weight = model.weight;
+        this.innovation_number = model.innovation_number;
+        this.cannot_come_back =model.cannot_come_back;
+        this.enabled = model.enabled;
+    };
 }
