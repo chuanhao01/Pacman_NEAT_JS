@@ -94,6 +94,10 @@ function Population(){
             let first_connection = new ConnectionHistory();
             let weight = randomNumber(-2, 2);
             first_connection.init(in_node, out_node, weight, this.global_innovation_number);
+            // Check if the connection is for inputs
+            if(in_node < this.input_nodes){
+                first_connection.is_intput_connection = true;
+            }
             // Update global connection history
             this.global_connection_history_list.push(first_connection);
             this.global_innovation_number++;
@@ -117,6 +121,9 @@ function Population(){
                 let new_connection = new ConnectionHistory();
                 let weight = randomNumber(-2, 2);
                 new_connection.init(in_node, out_node, weight, this.global_innovation_number);
+                if(in_node < this.input_nodes){
+                    new_connection.is_intput_connection = true;
+                }
                 // Update
                 this.global_connection_history_list.push(new_connection);
                 this.global_innovation_number++;
