@@ -15,7 +15,7 @@ function setup(){
     let player = new Player();
     model = JSON.parse(model);
     player.loadPlayer(model);
-    console.log(player);
+    console.log(player.brain.nodes_genes_needed);
 
     const nv = new NEAT_VISUAL();
     nv.init(player);
