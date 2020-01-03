@@ -11,9 +11,6 @@ class Game {
         // maze object
         this.maze;
 
-        // maze image
-        this.mazeImg;
-
         // Pac-Man object
         this.pacman;
 
@@ -41,8 +38,8 @@ class Game {
     }
 
     // init function
-    // receives all the game constants(JSON), mazeImg and tile representation(JSON)
-    init(gameConsts, mazeImg, tileRep) {
+    // receives all the game constants(JSON), tile representation(JSON)
+    init(gameConsts, tileRep) {
         // init the canvas
         this.canvas = createCanvas(gameConsts.CANVAS_WIDTH, gameConsts.CANVAS_HEIGHT);
 
@@ -51,9 +48,6 @@ class Game {
 
         // init the maze
         this.maze = new Maze(gameConsts.NUM_ROWS_TILES, gameConsts.NUM_COLS_TILES, gameConsts.TILE_WIDTH, gameConsts.TILE_HEIGHT, tileRep);
-
-        // set the maze image
-        this.mazeImg = mazeImg;
 
         // Init the pacman
         this.pacman = new Pacman(gameConsts.START_X_PACMAN, gameConsts.START_Y_PACMAN, gameConsts.PACMAN_WIDTH, gameConsts.PACMAN_SPEED);
@@ -239,22 +233,6 @@ class Game {
             this.ghostsArr[i].move(this.maze);
         }
 
-        // keyboard movements to control pacman
-        if (keyIsPressed) {
-            if (keyCode == UP_ARROW) {
-                this.pacman.updateDirection(0, -1);
-
-            } else if (keyCode == DOWN_ARROW) {
-                this.pacman.updateDirection(0, 1);
-
-            } else if (keyCode == LEFT_ARROW) {
-                this.pacman.updateDirection(-1, 0);
-
-            } else if (keyCode == RIGHT_ARROW) {
-                this.pacman.updateDirection(1, 0);
-
-            }
-        }
         // move the pacman (update the position of pacman)
         this.pacman.move(this.maze);
 
@@ -263,11 +241,6 @@ class Game {
     // show function
     // draws background, dots, ghosts and pacman
     show() {
-        background(0);
-
-        // draw the image of maze
-        image(this.mazeImg, 0, 0);
-
         // show the dots / energizers in the maze 
         this.maze.showDots();
 
@@ -565,19 +538,30 @@ class Game {
             directionVect = createVector(0, 1);
 
         } else if (index == 2) {
-            directionVect = createVector(0, -1);
+            directionVect = createVector(-1, 0);
 
         } else if (index == 3) {
-            directionVect = createVector(0, -1);
+            directionVect = createVector(1, 0);
         }
+        // set pacman direction 
+        this.pacman.updateDirection(directionVect.x, directionVect.y);
+    }
 
+    // function to allow player to play the game 
+    // (giving inputs and getting output from player to set direction of pacman)
+    // receives the player object 
+    play(player) {
+        // get outputs from player
+        let outputs = softMax(player.play(this.generateInputs()));
 
-
+        // handle the player output
+        this.handleOutputs(outputs);
     }
 
     // get the fitness score of pacman
     // returns fitness score of pacman
     getFitnessScore() {
+        return this.pacman.fitnessScore;
 
     }
 }

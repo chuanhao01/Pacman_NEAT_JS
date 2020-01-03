@@ -40,31 +40,45 @@ function setup() {
     population.initPopulation();
 
     // init the game array
-    for (let i = 0; i < 20; i++) {
-        gameArr.push(new Game());
-        gameArr[i].init(GAME_CONSTS, mazeImg, tileRep);
+    for (let i = 0; i < 100; i++) {
+        // need to tag each game with player index
+        gameArr.push([new Game(), i]);
+        gameArr[i][0].init(GAME_CONSTS, tileRep);
     }
 }
 
 function draw() {
-    // if(game.gameOver) {
-    //     noLoop();
-    // }
-    // console.log(game.generateInputs());
-    // game.run();
-    // game.show();
-    for (let i = gameArr.length - 1; i >= 0; i--) {
-        // if the game instance is over, splice it out of the game array
-        if (gameArr[i].gameOver) {
-            gameArr.splice(i, 1);
-        } else {
-            console.log(`Population no: ${i + 1}`);
-            console.log(softMax(population.population[i].play(gameArr[i].generateInputs())));
-            // if not, run and show the game instance
-            gameArr[i].run();
-            gameArr[i].show();
+    // draw the image of maze
+    image(mazeImg, 0, 0);
+
+    // if all of the game instances are over, then generate the gameArr again
+    // and generate the population again
+    if (gameArr.length == 0) {
+        // init the game array
+        for (let i = 0; i < 100; i++) {
+            // need to tag each game with player index
+            gameArr.push([new Game(), i]);
+            gameArr[i][0].init(GAME_CONSTS, tileRep);
+        }
+        population.getNewPopulation();
+
+    } else {
+        for (let i = gameArr.length - 1; i >= 0; i--) {
+            // if the game instance is over,
+            // set the fitness score of the player and 
+            // splice the game that is over out of the game array
+            if (gameArr[i][0].gameOver) {
+                population.population[gameArr[i][1]].setScore(gameArr[i][0].getFitnessScore());
+                gameArr.splice(i, 1);
+            } else {
+                // if not, let the players in population play , run and show the game instance
+                gameArr[i][0].play(population.population[gameArr[i][1]]);
+                gameArr[i][0].run();
+                gameArr[i][0].show();
+            }
         }
     }
+
 
     // Right before splicing the game when game is over, call population.population[i].setScore(fitnessScore)
     // After every game instance is over, call population.getNewPopulation(); to get new population
