@@ -63,6 +63,7 @@ function Population(){
                 for(let output_node of output_nodes_list){
                     // Connection history is generated here
                     let new_connection = this.generateConnection(input_node.node_number, output_node.node_number);
+                    new_connection.is_input_connection = true;
                     new_connections_history_list.push(new_connection);
                 }
             }

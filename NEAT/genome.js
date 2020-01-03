@@ -225,7 +225,7 @@ function Genome(){
     this.mutateEnableConnection = function(){
         for(let connection_history of this.connections_history_list){
             if(Math.random() < this.mutation_rates.enable_connection){
-                if(!connection_history.cannot_come_back){
+                if(!connection_history.cannot_come_back && !connection_history.is_input_connection){
                     connection_history.enabled = !connection_history.enabled;
                 }
             }

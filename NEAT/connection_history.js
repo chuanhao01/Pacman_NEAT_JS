@@ -6,6 +6,7 @@ function ConnectionHistory(){
         this.weight = weight;
         this.innovation_number = innovation_number;
         this.cannot_come_back = false;
+        this.is_input_connection = false;
         this.enabled = true;
     };
     this.clone = function(){
@@ -19,7 +20,8 @@ function ConnectionHistory(){
         this.out_node = model.out_node;
         this.weight = model.weight;
         this.innovation_number = model.innovation_number;
-        this.cannot_come_back =model.cannot_come_back;
+        this.cannot_come_back = model.cannot_come_back;
+        this.is_input_connection = model.is_input_connection;
         this.enabled = model.enabled;
     };
 }
