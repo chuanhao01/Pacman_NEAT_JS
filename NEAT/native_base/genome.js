@@ -21,9 +21,19 @@ function Genome(){
         // Clear the inputs of the nodes before starting
         this.clearNodes();
         // Feed in the inputs into the nodes
-        for(let i=0; i<inputs.length; i++){
-            this.nodes_genes_needed[i].input_sum = inputs[i];
+
+        let i = 0;
+        for(let node of this.nodes_genes_needed){
+            if(node.type === 'input'){
+                node.input_sum = inputs[i];
+                i++;
+            }
         }
+
+        // for(let i=0; i<inputs.length; i++){
+        //     this.nodes_genes_needed[i].input_sum = inputs[i];
+        // }
+
         // feedfwd the nodes and to get the outputs
         const max_layer = this.getMaxLayer();
         for(let i=0; i<=max_layer; i++){
@@ -225,7 +235,7 @@ function Genome(){
     this.mutateEnableConnection = function(){
         for(let connection_history of this.connections_history_list){
             if(Math.random() < this.mutation_rates.enable_connection){
-                if(!connection_history.cannot_come_back){
+                if(!connection_history.cannot_come_back && !connection_history.is_input_connection){
                     connection_history.enabled = !connection_history.enabled;
                 }
             }
