@@ -3,7 +3,7 @@ const NEAT_CONFIGS = {
     total_pop: 20,
     // NEAT configurations
     mutation_rates: {
-        add_node: 0.001,
+        add_node: 0.002,
         add_connection: 0.05,
         shift_weight: 0.5,
         new_weight: 0.2,
