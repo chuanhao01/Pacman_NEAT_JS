@@ -152,6 +152,8 @@ class Game {
                 }
             }
         }
+        // previous score of pacman
+        // let prevGameScore = this.pacman.gameScore;
 
         // if pacman eats dots/energizer, remove them, regardless of state of ghosts
         if (this.pacman.eatenDot(this.maze) || this.pacman.eatenEnergizer(this.maze)) {
@@ -169,6 +171,12 @@ class Game {
             // console.log(`Fitness Score: ${this.pacman.fitnessScore}`);
 
         }
+
+        // if the pacman does not obtain a score within a certain time frame,
+        // game over
+        // if(this.pacman.steps == 0 && ((this.pacman.gameScore - prevGameScore) == 0)) {
+        //     this.gameOver = true;
+        // }
 
     }
 
@@ -242,7 +250,7 @@ class Game {
 
         // Need to check if the player has stopped moving pacman 
         // if pacman stops moving, game over
-        if(prevPosition.x == this.pacman.currentPosition.x && prevPosition.y == this.pacman.currentPosition.y) {
+        if (prevPosition.x == this.pacman.currentPosition.x && prevPosition.y == this.pacman.currentPosition.y) {
             this.gameOver = true;
         }
 

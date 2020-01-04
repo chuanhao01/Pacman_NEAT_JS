@@ -23,7 +23,7 @@ let gameBatch = [];
 const population = new Population();
 
 // Population size
-const POP_SIZE = 600;
+const POP_SIZE = 500;
 
 // Batch size
 const BATCH_SIZE = 10;
@@ -32,7 +32,7 @@ const BATCH_SIZE = 10;
 const SLIDER_MIN_VAL = 1;
 
 // Slider max value
-const SLIDER_MAX_VAL = 25;
+const SLIDER_MAX_VAL = 100;
 
 
 function preload() {
