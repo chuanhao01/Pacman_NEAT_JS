@@ -152,7 +152,8 @@ class Game {
                 }
             }
         }
-        // if this.this.pacman eats dots/energizer, remove them, regardless of state of ghosts
+
+        // if pacman eats dots/energizer, remove them, regardless of state of ghosts
         if (this.pacman.eatenDot(this.maze) || this.pacman.eatenEnergizer(this.maze)) {
             // Get current grid coordinates of this.this.pacman 
             let currentGridCoords = this.maze.remap(this.pacman.currentPosition, this.pacman.currentDirection);
@@ -233,8 +234,17 @@ class Game {
             this.ghostsArr[i].move(this.maze);
         }
 
+        // previous position of pacman
+        let prevPosition = createVector(this.pacman.currentPosition.x, this.pacman.currentPosition.y);
+
         // move the pacman (update the position of pacman)
         this.pacman.move(this.maze);
+
+        // Need to check if the player has stopped moving pacman 
+        // if pacman stops moving, game over
+        if(prevPosition.x == this.pacman.currentPosition.x && prevPosition.y == this.pacman.currentPosition.y) {
+            this.gameOver = true;
+        }
 
     }
 
