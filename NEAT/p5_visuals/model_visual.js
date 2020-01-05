@@ -26,10 +26,6 @@ function NEAT_VISUAL(){
         let layers = this.getLayers(nodes_needed, max_layer);
         // Getting the connnection needed
         let connections_needed = this.getEnabledConnections(connections);
-        // Sorting the layers
-        layers.sort(function(a, b){
-            return a.layer_number - b.layer_number;
-        });
         // Generate the matrix here
         matrix_data = this.genMatrixData(layers);
         // Draw the matrix
@@ -37,8 +33,7 @@ function NEAT_VISUAL(){
         // Drawing connections
         this.drawConnections(matrix_data, connections_needed);
 
-        console.table(matrix_data);
-
+        // console.table(matrix_data);
         // let sum = 0;
         // for(let layer of layers){
         //     sum += layer.nodes.length;
@@ -52,7 +47,40 @@ function NEAT_VISUAL(){
     // Utility functions
     this.getLayers =  function(nodes_needed, max_layer){
         let layers = [];
-        for(let i=-1; i<=max_layer; i++){
+        for(let i=0; i<=max_layer; i++){
+            for(let node of nodes_needed){
+                if(node.layer_number === i){
+                    // If the node is in the current layer
+                    if(layers.length === 0){
+                        // If there are no layers yet, init one
+                        let layer = new Layer();
+                        layer.init(i);
+                        layer.addNode(node);
+                        layers.push(layer);
+                    }
+                    else{
+                        // If there are already layers made
+                        let new_layer = true; 
+                        for(let layer of layers){
+                            if(layer.layer_number === node.layer_number){
+                                // If it belongs to an existsing layer
+                                new_layer = false;
+                                layer.addNode(node);
+                            }
+                        }
+                        if(new_layer){
+                            // If a new layer is needed
+                            let layer = new Layer();
+                            layer.init(node.layer_number);
+                            layer.addNode(node);
+                            layers.push(layer);
+                        }
+                    }
+                }
+            }
+        }
+        // Get the last layer
+        for(let i=-1; i<0; i++){
             for(let node of nodes_needed){
                 if(node.layer_number === i){
                     // If the node is in the current layer
@@ -141,7 +169,6 @@ function NEAT_VISUAL(){
     this.drawConnections = function(matrix_data, connections){
         for(let connection of connections){
             // For each connection
-            console.log(connection)
             let in_pos = this.findNode(matrix_data, connection.in_node),
             out_pos = this.findNode(matrix_data, connection.out_node);
             in_pos = this.mapMatrixDraw(in_pos);
