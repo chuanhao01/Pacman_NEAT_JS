@@ -32,7 +32,7 @@ const main = {
     // to be put into function preload
     loadData() {
         // load the maze image
-        this.mazeImg = loadImage("./assets/map.jpg");
+        this.mazeImg = loadImage("../Game/assets/map.jpg");
 
         // load the tile representation data
         // need to import the tile representation(contains info of which parts are on which tile)
@@ -41,7 +41,7 @@ const main = {
         // 0 = dot
         // 8 = energizer
         // 6 = blank space
-        this.tileRep = loadJSON("./data/tileRep.json");
+        this.tileRep = loadJSON("../Game/data/tileRep.json");
 
     },
     setUp() {
