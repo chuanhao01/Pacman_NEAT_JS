@@ -34,15 +34,25 @@ function NEAT_VISUAL(){
         matrix_data = this.genMatrixData(layers);
         // Draw the matrix
         this.drawMatrix(matrix_data);
+        // Drawing connections
+        this.drawConnections(matrix_data, connections_needed);
+
         console.table(matrix_data);
 
-        console.log(layers);
-        console.log(connections_needed);
+        // let sum = 0;
+        // for(let layer of layers){
+        //     sum += layer.nodes.length;
+        // }
+        // console.log(`sum: ${sum}`);
+        // console.log(nodes_needed);
+
+        // console.log(connections_needed);
+        // console.log(layers);
     };
     // Utility functions
     this.getLayers =  function(nodes_needed, max_layer){
         let layers = [];
-        for(let i=0; i<max_layer; i++){
+        for(let i=-1; i<=max_layer; i++){
             for(let node of nodes_needed){
                 if(node.layer_number === i){
                     // If the node is in the current layer
@@ -111,6 +121,8 @@ function NEAT_VISUAL(){
             }
             matrix_data.push(row);
         }
+        // Adding the outputs here
+
         return matrix_data;
     };
     this.drawMatrix = function(matrix_data){
@@ -125,5 +137,39 @@ function NEAT_VISUAL(){
                 }
             }
         }
+    };
+    this.drawConnections = function(matrix_data, connections){
+        for(let connection of connections){
+            // For each connection
+            console.log(connection)
+            let in_pos = this.findNode(matrix_data, connection.in_node),
+            out_pos = this.findNode(matrix_data, connection.out_node);
+            in_pos = this.mapMatrixDraw(in_pos);
+            out_pos = this.mapMatrixDraw(out_pos);
+            this.drawConnection(in_pos, out_pos);
+        }
+    };
+    this.findNode = function(matrix_data, node_number){
+        for(let y=0; y<matrix_data.length; y++){
+            for(let x=0; x<matrix_data[y].length; x++){
+                if(matrix_data[y][x] !== 0){
+                    // If there is a node here
+                    let node = matrix_data[y][x];
+                    if(node.node_number === node_number){
+                        return [y, x];
+                    }
+                }
+            }
+        }
+    };
+    this.drawConnection = function(in_pos, out_pos){
+        stroke(255);
+        strokeWeight(2);
+        line(in_pos[1], in_pos[0], out_pos[1], out_pos[0]);
+    };
+    this.mapMatrixDraw = function(matrix_form){
+        let map_y = matrix_form[0] * 60 + this.starting_pos.y,
+        map_x = matrix_form[1] * 60 + this.starting_pos.x;
+        return [map_y, map_x];
     };
 }
