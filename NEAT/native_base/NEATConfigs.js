@@ -4,9 +4,9 @@ const NEAT_CONFIGS = {
     // NEAT configurations
     mutation_rates: {
         add_node: 0.0001,
-        add_connection: 0.0002,
-        shift_weight: 0.1,
-        new_weight: 0.01,
+        add_connection: 0.0005,
+        shift_weight: 0.2,
+        new_weight: 0.05,
         enable_connection: 0.4 
     },
     weight_shift_coeff: 0.03,

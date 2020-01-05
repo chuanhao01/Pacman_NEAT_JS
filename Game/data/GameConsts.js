@@ -72,3 +72,4 @@ class GameConsts {
         this.CLYDE_SCATTER_Y_TARGET = ((this.NUM_ROWS_TILES - 1) * this.TILE_HEIGHT) + (this.TILE_HEIGHT / 2);
     }
 }
+const GAME_CONSTS = new GameConsts();

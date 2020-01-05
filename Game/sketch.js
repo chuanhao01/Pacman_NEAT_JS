@@ -4,9 +4,6 @@
  * Testing file for NEAT x PACMAN
  */
 
-// Constants used for the game
-const GAME_CONSTS = new GameConsts();
-
 // tile representation
 let tileRep;
 
@@ -121,20 +118,6 @@ function draw() {
                     }
                 }
             }
-            // for (let i = gameArr.length - 1; i >= 0; i--) {
-            //     // if the game instance is over,
-            //     // set the fitness score of the player and 
-            //     // splice the game that is over out of the game array
-            //     if (gameArr[i][0].gameOver) {
-            //         population.population[gameArr[i][1]].setScore(gameArr[i][0].getFitnessScore());
-            //         gameArr.splice(i, 1);
-            //     } else {
-            //         // if not, let the players in population play , run and show the game instance
-            //         gameArr[i][0].play(population.population[gameArr[i][1]]);
-            //         gameArr[i][0].run();
-            //         gameArr[i][0].show();
-            //     }
-            // }
         }
     }
 
