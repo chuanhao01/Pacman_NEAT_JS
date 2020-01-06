@@ -1,80 +1,8 @@
 /**
  * File: Sketch.js 
  * --------------------
- * Main program for the PacMan game
+ * Testing file for NEAT x PACMAN
  */
-
-// Width of the canvas
-const CANVAS_WIDTH = 448;
-
-// Height of the canvas
-const CANVAS_HEIGHT = 496;
-
-// canvas object
-// 
-
-// Number of rows of tiles
-const NUM_ROWS_TILES = 31;
-
-// Number of columns of tiles
-const NUM_COLS_TILES = 28;
-
-// Width of the tile
-const TILE_WIDTH = CANVAS_WIDTH / NUM_COLS_TILES;
-
-// Height of the tile
-const TILE_HEIGHT = CANVAS_HEIGHT / NUM_ROWS_TILES;
-
-// Width of the Pac-Man
-const PACMAN_WIDTH = 20;
-
-// Speed of the Pac-Man
-const PACMAN_SPEED = 2;
-
-// Starting x position of pacman
-const START_X_PACMAN = (13 * TILE_WIDTH) + (TILE_WIDTH / 2);
-
-// Starting y position of pacman
-const START_Y_PACMAN = (23 * TILE_HEIGHT) + (TILE_HEIGHT / 2);
-
-// Width of the ghost
-const GHOST_WIDTH = PACMAN_WIDTH;
-
-// Speed of the ghost
-const GHOST_SPEED = PACMAN_SPEED;
-
-// Starting x position of ghost
-const START_X_GHOST = (13 * TILE_WIDTH) + (TILE_WIDTH / 2);
-
-// Starting y position of ghost
-const START_Y_GHOST = (11 * TILE_HEIGHT) + (TILE_HEIGHT / 2);
-
-// x coordinates of target tile for scatter mode for Blinky(red)
-const BLINKY_SCATTER_X_TARGET = ((NUM_COLS_TILES - 1) * TILE_WIDTH) + (TILE_WIDTH / 2);
-
-// y coordinates of target tile for scatter mode for Blinky(red)
-const BLINKY_SCATTER_Y_TARGET = TILE_HEIGHT / 2;
-
-// x coordinates of target tile for scatter mode for Pinky(pink)
-const PINKY_SCATTER_X_TARGET = TILE_WIDTH / 2;
-
-// y coordinates of target tile for scatter mode for Pinky(pink)
-const PINKY_SCATTER_Y_TARGET = TILE_HEIGHT / 2;
-
-// x coordinates of target tile for scatter mode for Inky(turquoise)
-const INKY_SCATTER_X_TARGET = ((NUM_COLS_TILES - 1) * TILE_WIDTH) + (TILE_WIDTH / 2);
-
-// y coordinates of target tile for scatter mode for Inky(turquoise)
-const INKY_SCATTER_Y_TARGET = ((NUM_ROWS_TILES - 1) * TILE_HEIGHT) + (TILE_HEIGHT / 2);
-
-// x coordinates of target tile for scatter mode for Clyde(orange)
-const CLYDE_SCATTER_X_TARGET = TILE_WIDTH / 2;
-
-// y coordinates of target tile for scatter mode for Clyde(orange)
-const CLYDE_SCATTER_Y_TARGET = ((NUM_ROWS_TILES - 1) * TILE_HEIGHT) + (TILE_HEIGHT / 2);
-
-// Maze object to store all info about the 2D array of tiles
-let maze;
 
 // tile representation
 let tileRep;
@@ -82,23 +10,27 @@ let tileRep;
 // Maze image 
 let mazeImg;
 
-// Pac-Man object
-let pacman;
+// game object array
+let gameArr = [];
 
-// Ghost blinky
-let blinky;
+// game batch array
+let gameBatch = [];
 
-// Ghost pinky
-let pinky;
+// NEAT population
+const population = new Population();
 
-// Ghost inky
-let inky;
+// Population size
+const POP_SIZE = 500;
 
-// Ghost clyde
-let clyde;
+// Batch size
+const BATCH_SIZE = 10;
 
-// Array to store all four ghost
-let ghostsArr;
+// Slider min value
+const SLIDER_MIN_VAL = 1;
+
+// Slider max value
+const SLIDER_MAX_VAL = 100;
+
 
 function preload() {
     // load the maze image
@@ -116,168 +48,99 @@ function preload() {
 
 
 function setup() {
-    createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+    // setting up NEAT population
+    population.init(NEAT_CONFIGS);
+    population.initPopulation();
 
-    // init the maze
-    maze = new Maze(NUM_ROWS_TILES, NUM_COLS_TILES, TILE_WIDTH, TILE_HEIGHT, tileRep);
+    // init the game array
+    for (let i = 0; i < POP_SIZE; i++) {
+        // need to tag each game with player index
+        gameArr.push([new Game(), i]);
+        gameArr[i][0].init(GAME_CONSTS, tileRep);
+    }
 
-    // Init the pacman
-    pacman = new Pacman(START_X_PACMAN, START_Y_PACMAN, PACMAN_WIDTH, PACMAN_SPEED);
-
-    // init blinky
-    blinky = new Ghost(START_X_GHOST, START_Y_GHOST, GHOST_WIDTH, GHOST_SPEED);
-
-    // init the scatter mode target tile of blinky
-    blinky.setScatterTargetTile(createVector(BLINKY_SCATTER_X_TARGET, BLINKY_SCATTER_Y_TARGET));
-
-    // init pinky
-    pinky = new Pinky(START_X_GHOST, START_Y_GHOST, GHOST_WIDTH, GHOST_SPEED);
-
-    // init the scatter mode target tile of pinky
-    pinky.setScatterTargetTile(createVector(PINKY_SCATTER_X_TARGET, PINKY_SCATTER_Y_TARGET));
-
-    // init inky
-    inky = new Inky(START_X_GHOST, START_Y_GHOST, GHOST_WIDTH, GHOST_SPEED);
-
-    // init the scatter mode target tile of inky
-    inky.setScatterTargetTile(createVector(INKY_SCATTER_X_TARGET, INKY_SCATTER_Y_TARGET));
-
-    // init clyde
-    clyde = new Clyde(START_X_GHOST, START_Y_GHOST, GHOST_WIDTH, GHOST_SPEED);
-
-    // init the scatter mode target tile of clyde
-    clyde.setScatterTargetTile(createVector(CLYDE_SCATTER_X_TARGET, CLYDE_SCATTER_Y_TARGET));
-
-    // init ghost array
-    ghostsArr = [blinky, pinky, inky, clyde];
-
+    // init the game batch array (taking the first 5 game instances array)
+    for (let i = 0; i < BATCH_SIZE; i++) {
+        gameBatch.push(gameArr[i]);
+    }
+    slider = createSlider(SLIDER_MIN_VAL, SLIDER_MAX_VAL, SLIDER_MIN_VAL);
 }
 
 function draw() {
-    background(0);
-    // draw the image of maze
-    image(mazeImg, 0, 0);
+    for (let x = 0; x < slider.value(); x++) {
+        // draw the image of maze
+        image(mazeImg, 0, 0);
 
-    // show the dots / energizers in the maze 
-    maze.showDots();
+        // if all of the game instances are over, then generate the gameArr again
+        // and generate the population again
+        // also, take the first 5 game instances in gameArr into the gameBatch Arr
+        if (gameArr.length == 0) {
+            // init the game array
+            for (let i = 0; i < POP_SIZE; i++) {
+                // need to tag each game with player index
+                gameArr.push([new Game(), i]);
+                gameArr[i][0].init(GAME_CONSTS, tileRep);
+            }
+            population.getNewPopulation();
 
-    // move the pacman
-    pacman.move(maze);
+            // init the game batch array (taking the first 5 game instances array)
+            for (let i = 0; i < BATCH_SIZE; i++) {
+                gameBatch.push(gameArr[i]);
+            }
 
-    // show the pacman
-    pacman.show();
-
-    // ----------------------------------Setting the ghosts mode----------------------------------------//
-    for (let i = 0; i < ghostsArr.length; i++) {
-        // Have to first check if ghosts is not eaten
-        // as long as ghosts is not eaten, set other modes appropriately
-        if (!ghostsArr[i].mode.eaten) {
-            // if pacman eats a ghosts that is not eaten yet
-            // check if ghosts is frightened
-            if (pacman.eatGhost(ghostsArr[i].currentPosition)) {
-                // if ghosts is not frightened, pacman is dead (GAME OVER)
-                if (!ghostsArr[i].mode.frightened) {
-                    console.log("GAME OVER");
-
-                } else {
-                    // if ghosts is frightened, then set ghosts to eaten mode
-                    ghostsArr[i].setMode("eaten");
-                    console.log("EATEN");
-
+        } else {
+            // Doing batch learning
+            // if the batch is done learning, then re-generate the batch
+            if (gameBatch.length == 0) {
+                console.log(gameArr.length);
+                // init the game batch array (taking the first 5 game instances array)
+                for (let i = 0; i < BATCH_SIZE; i++) {
+                    gameBatch.push(gameArr[i]);
                 }
 
-                // if frightened mode has ended, set mode to mode before frightened mode (chase or scatter)
-            } else if (ghostsArr[i].frightenedModeEnded()) {
-                ghostsArr[i].setMode(ghostsArr[i].modeBefFrightMode());
-                console.log(ghostsArr[i].modeBefFrightMode());
+            } else {
+                for (let i = gameBatch.length - 1; i >= 0; i--) {
+                    // if the game instance is over,
+                    // set the fitness score of the player and 
+                    // splice out the game in the batch game array
+                    // splice the game that is over out of the game array
+                    if (gameBatch[i][0].gameOver) {
+                        population.population[gameBatch[i][1]].setScore(gameBatch[i][0].getFitnessScore());
+                        gameBatch.splice(i, 1);
+                        gameArr.splice(i, 1);
 
-                // if pacman eats energizer, then set ghosts to frightened mode
-            } else if (pacman.eatenEnergizer(maze)) {
-                ghostsArr[i].setMode("frightened");
-                console.log("FRIGHTENED");
+                    } else {
+                        // if not, let the players in population play , run and show the game instance
+                        gameBatch[i][0].play(population.population[gameBatch[i][1]]);
+                        gameBatch[i][0].run();
+                        gameBatch[i][0].show();
 
-                // if chase mode has ended, set mode to scatter mode
-            } else if (ghostsArr[i].chaseModeEnded()) {
-                ghostsArr[i].setMode("scatter");
-                console.log("SCATTER");
-
-                // if scatter mode has ended, set the mode to chase mode
-            } else if (ghostsArr[i].scatterModeEnded()) {
-                ghostsArr[i].setMode("chase");
-                console.log("CHASE");
-
-            }
-        } else {
-            // if ghosts is eaten, check if it has reached front of ghosts house
-            if (ghostsArr[i].reachedGhostHouse()) {
-                // if it has reached, check if mode before frightened was chase or scatter
-                // then set mode accordingly
-                ghostsArr[i].setMode(ghostsArr[i].modeBefFrightMode());
-                console.log(ghostsArr[i].modeBefFrightMode());
+                    }
+                }
             }
         }
     }
-    // if pacman eats dots/energizer, remove them, regardless of state of ghosts
-    if (pacman.eatenDot(maze) || pacman.eatenEnergizer(maze)) {
-        // Get current grid coordinates of pacman 
-        let currentGridCoords = maze.remap(pacman.currentPosition, pacman.currentDirection);
-        // remove the dot/energizer
-        maze.removeDot(currentGridCoords);
-    }
 
-    // console.log(pinky.timer);
-    // console.log("Frightened Mode Timer: " + pinky.frightenedModeTimer);
 
-    // ----------------------------------Setting the ghosts mode----------------------------------------//
+    // Right before splicing the game when game is over, call population.population[i].setScore(fitnessScore)
+    // After every game instance is over, call population.getNewPopulation(); to get new population
 
-    for (let i = 0; i < ghostsArr.length; i++) {
-        // handle the mode appropriately
-        // if handling mode for Blinky, just give pacman's current position
-        if (i == 0) {
-            ghostsArr[i].handleMode(pacman.currentPosition);
+    // // Game events execution order
+    // // ---------------------------
+    // // 1) Coordination of setting current mode of ghost
+    // // 2) Handling what to do for the current mode of ghost
+    // // 3) Move ghost 
+    // // 4) Keyboard controls for pacman
+    // // 5) Move pacman
+    // // 6) Background 
+    // // 7) Show dots / energizers
+    // // 8) Show ghost
+    // // 9) Show pacman
 
-        } else if (i == 1 || i == 3) {
-            // if handling mode for Pinky and Clyde, give pacman and maze
-            ghostsArr[i].handleMode(pacman, maze);
+    // // Game functions to be in the game run function
+    // // 1) Coordination of setting current mode of ghost
+    // // 2) Handling what to do for the current mode of ghost
+    // // 3) Updating position of entities (Move ghost, Keyboard controls for pacman, Move pacman)
 
-        } else if (i == 2) {
-            // if handling mode for Inky, give pacman, maze and blinky
-            ghostsArr[i].handleMode(pacman, maze, blinky);
-        }
-
-        // show the ghosts
-        ghostsArr[i].show();
-
-        // move the ghosts
-        ghostsArr[i].move(maze);
-    }
-
-    // keyboard movements to control pacman
-    if (keyIsPressed) {
-        if (keyCode == UP_ARROW) {
-            pacman.updateDirection(0, -1);
-
-        } else if (keyCode == DOWN_ARROW) {
-            pacman.updateDirection(0, 1);
-
-        } else if (keyCode == LEFT_ARROW) {
-            pacman.updateDirection(-1, 0);
-
-        } else if (keyCode == RIGHT_ARROW) {
-            pacman.updateDirection(1, 0);
-
-        }
-    }
-
-    // Game events execution order
-    // ---------------------------
-    // 1) Background 
-    // 2) Show dots / energizers
-    // 3) Coordination of setting current mode of ghost
-    // 4) Handling what to do for the current mode of ghost
-    // 5) Show ghost
-    // 6) Move ghost 
-    // 7) Keyboard controls for pacman
-    // 8) Move pacman
-    // 9) Show pacman
+    // // Show entities (Background, Show dots / energizers, Show ghost, Show pacman)
 }
