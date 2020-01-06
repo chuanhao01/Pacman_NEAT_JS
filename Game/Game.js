@@ -174,9 +174,9 @@ class Game {
 
         // if the pacman does not obtain a score within a certain time frame,
         // game over
-        // if(this.pacman.steps == 0 && ((this.pacman.gameScore - prevGameScore) == 0)) {
-        //     this.gameOver = true;
-        // }
+        if(this.pacman.steps == 0 && ((this.pacman.gameScore - prevGameScore) == 0)) {
+            this.gameOver = true;
+        }
 
     }
 
@@ -375,13 +375,14 @@ class Game {
                 // if ghost is found, then just append the current grid dist to inputs
                 if (ghostSeen) {
                     // console.log(`ghost seen`);
-                    inputs.push(1 / gridDist);
+                    // inputs.push(1 / gridDist);
+                    inputs.push(gridDist / 100);
                     break;
                 }
             }
-            // if no ghosts found, just append 0 to the inputs 
+            // if no ghosts found, just append 4 to the inputs 
             if (!ghostSeen) {
-                inputs.push(0);
+                inputs.push(4 / 100);
             }
 
         }
@@ -515,7 +516,8 @@ class Game {
         }
         // ---------------END OF INPUTS FOR GHOST FRIGHTENED MODE----------------------------//
         // add the bias node
-        inputs.push(1);
+        // inputs.push(1);
+        inputs.push(1 / 100);
 
         // after getting all the inputs, return them
         return inputs;
@@ -526,19 +528,22 @@ class Game {
     // handle outputs from neural network
     // receives outputs from neural network
     handleOutputs(outputs) {
-        // var to store the smallest probablity of dangers from outputs
-        let smallestProbOfDanger = Infinity;
+        // // var to store the smallest probablity of dangers from outputs
+        // let smallestProbOfDanger = Infinity;
 
-        // var to store the index of the smallest probability of danger
+        // var to store the largest probablity of safety from outputs
+        let largestProbOfDanger = 0;
+
+        // var to store the index of the largest probability of danger
         let index = 0;
 
         // new direction vector
         let directionVect = null;
 
-        // get the index of the smallest prob
+        // get the index of the largest prob
         for (let i = 0; i < outputs.length; i++) {
-            if (smallestProbOfDanger > outputs[i]) {
-                smallestProbOfDanger = outputs[i];
+            if (largestProbOfDanger < outputs[i]) {
+                largestProbOfDanger = outputs[i];
                 index = i;
             }
         }
