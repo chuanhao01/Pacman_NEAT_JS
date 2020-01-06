@@ -10,4 +10,9 @@ function NodeHistory(){
         new_node_history.init(this.node_number, this.type, this.layer_number);
         return new_node_history;
     };
+    this.load = function(model){
+        this.node_number = model.node_number;
+        this.type = model.type;
+        this.layer_number = model.layer_number;
+    };
 }
