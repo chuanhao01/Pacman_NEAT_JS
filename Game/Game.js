@@ -174,9 +174,9 @@ class Game {
 
         // if the pacman does not obtain a score within a certain time frame,
         // game over
-        if(this.pacman.steps == 0 && ((this.pacman.gameScore - prevGameScore) == 0)) {
-            this.gameOver = true;
-        }
+        // if(this.pacman.steps == 0 && ((this.pacman.gameScore - prevGameScore) == 0)) {
+        //     this.gameOver = true;
+        // }
 
     }
 

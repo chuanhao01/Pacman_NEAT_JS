@@ -12,7 +12,7 @@ const main = {
     popSize: 500,
 
     // batch size
-    batchSize: 10,
+    batchSize: 20,
 
     // tile representation
     tileRep: null,
@@ -27,7 +27,7 @@ const main = {
     sliderMinVal: 1,
 
     // Slider max value
-    sliderMaxVal: 100,
+    sliderMaxVal: 50,
 
     // to be put into function preload
     loadData() {
@@ -91,7 +91,7 @@ const main = {
                 // Doing batch learning
                 // if the batch is done learning, then re-generate the batch
                 if (this.gameBatch.length == 0) {
-                    console.log(this.gameArr.length);
+                    // console.log(this.gameArr.length);
                     // init the game batch array (taking the first 5 game instances array)
                     for (let i = 0; i < this.batchSize; i++) {
                         this.gameBatch.push(this.gameArr[i]);
